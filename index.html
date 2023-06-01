@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=
+  , initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style/style.css">
+  <title>Currency exchange</title>
+</head>
+<body>
+  <div class="header">
+    <div class="header-marquee" id="currencyMarquee"></div>
+  </div>
+  <main>
+    <div class="container">
+      <div class="input-wrapper">
+        <input type="text" id="numberInput1" placeholder="Введіть число">
+        <select id="currencySelect1">
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="UAH">UAH</option>
+        </select>
+        <div class="error-message" id="errorMessage1"></div>
+      </div>
+      <div class="input-wrapper">
+        <input type="text" id="numberInput2" placeholder="Введіть число">
+        <select id="currencySelect2">
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="UAH">UAH</option>
+        </select>
+        <div class="error-message" id="errorMessage2"></div>
+      </div>
+    </div>
+  
+  </main>
+  <script src="./script/script.js"></script>
+</body>
+</html>

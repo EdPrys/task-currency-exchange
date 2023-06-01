@@ -1,0 +1,63 @@
+body {
+  background: #05282b;
+  font-family: 'Inter', sans-serif;
+
+}
+
+.header {
+  position: relative;
+  overflow: hidden;
+
+  height: 35px;
+  
+  background-color: #1f9b8a;
+  padding: 20px;
+  color: #6e2546;
+  font-size: 24px;
+  font-weight: 700;
+}
+.header-marquee {
+  position: absolute;
+  white-space: nowrap;
+  animation: marquee 10s linear infinite;
+}
+@keyframes marquee {
+  0% {
+    right: 100%;
+  }
+  100% {
+    right: -100%;
+  }
+}
+
+main {
+  padding: 5%;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+
+select {
+  margin-right: 10px;
+}
+
+.input-wrapper {
+  text-align: center;
+}
+.input-wrapper input {
+  padding: 10px;
+  font-size: 16px;
+}
+.input-wrapper select {
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+}
+.input-wrapper .error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
