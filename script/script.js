@@ -1,17 +1,38 @@
+"use strict"
 const url =
   "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchangenew?json";
-let usdRate, eurRate;
+
+const validateField = (triggerInputElement, triggerErrorMessage) => {
+  // RegExp is checking the integer number
+  const errorMessage = document.getElementById(triggerErrorMessage);
+  const inputValue = document.getElementById(triggerInputElement).value.trim();
+  const isValid = /^\d+$/.test(inputValue)
+
+  // Handle invalid input
+  if (!isValid && inputValue !== '') {
+    errorMessage.textContent = "Введено недійсне число";
+    return false
+  }
+
+  errorMessage.textContent = "";
+  return true
+}
 
 fetch(url)
   .then((response) => response.json())
   .then((data) => {
     const rates = data.filter((item) => item.cc === "USD" || item.cc === "EUR");
 
-    usdRate = rates.find((item) => item.cc === "USD").rate;
-    eurRate = rates.find((item) => item.cc === "EUR").rate;
+    const {rate: usdRate} = rates.find((item) => item.cc === "USD");
+    // const 
+    const {rate: eurRate} = rates.find((item) => item.cc === "EUR");
+
+    console.log('data', data)
 
     //*************************HEADER******************
     const currencyMarquee = document.getElementById("currencyMarquee");
+    // const currencyMarquee = document.querySelector("[data-error-message]");
+
     currencyMarquee.innerHTML = `Курс USD: ${usdRate} || Курс EUR: ${eurRate}`;
 
     //************************MAIN*****************
@@ -21,93 +42,136 @@ fetch(url)
     const numberInput2 = document.getElementById("numberInput2");
     const currencySelect2 = document.getElementById("currencySelect2");
 
-    numberInput1.addEventListener("input", function () {
-      validateInput1();
+    numberInput1.addEventListener("input", () => {
+      const isValid = validateField('numberInput1', 'errorMessage1')
+
+      if(!isValid) {
+        return;
+      }
+
+      convertCurrency();
+    });
+    
+    currencySelect1.addEventListener("change", () => {
+      const isValid = validateField('numberInput1', 'errorMessage1')
+
+      if(!isValid) {
+        return;
+      }
+
       convertCurrency();
     });
 
-    numberInput2.addEventListener("input", function () {
-      validateInput2();
+    numberInput2.addEventListener("input", () => {
+      const isValid = validateField('numberInput2', 'errorMessage2')
+
+      if(!isValid) {
+        return;
+      }
+
       convertCurrency();
     });
-    //----------------------VALIDATION---------------------
-    function validateInput1() {
-      const errorMessage1 = document.getElementById("errorMessage1");
-      const inputValue = numberInput1.value.trim();
 
-      if (inputValue === "") {
-        errorMessage1.textContent = "";
-      } else if (!/^\d+$/.test(inputValue)) {
-        errorMessage1.textContent = "Введено недійсне число";
-      } else {
-        errorMessage1.textContent = "";
+    currencySelect2.addEventListener("change", () => {
+      const isValid = validateField('numberInput2', 'errorMessage2')
+
+      if(!isValid) {
+        return;
       }
-    }
 
-    function validateInput2() {
-      const errorMessage2 = document.getElementById("errorMessage2");
-      const inputValue = numberInput2.value.trim();
+      convertCurrency();
+    });
 
-      if (inputValue === "") {
-        errorMessage2.textContent = "";
-      } else if (!/^\d+$/.test(inputValue)) {
-        errorMessage2.textContent = "Введено недійсне число";
-      } else {
-        errorMessage2.textContent = "";
-      }
-    }
     //----------------------CONVERT---------------------
-    function convertCurrency() {
+    const convertCurrency = () => {
       const inputValue1 = numberInput1.value.trim();
       const inputValue2 = numberInput2.value.trim();
 
-      if (inputValue1 !== "" && /^\d+$/.test(inputValue1)) {
-        const selectedCurrency1 = currencySelect1.value;
-        const selectedCurrency2 = currencySelect2.value;
+      const rateFrom = parseFloat(inputValue1).toFixed(2);
+      const currencyItemFrom = rates.find((item) => item.cc === currencySelect1.value)?.rate
+      // if (!currencyItemFrom) {
+      //   console.error('Incorrect currency value FROM')
+      //   return;
+      // }
 
-        let convertedValue;
+      // const rateTo = parseToFloat(inputValue2).toFixed(2);
+      const currencyItemTo = rates.find((item) => item.cc === currencySelect2.value)?.rate
+      // if (!currencyItemTo) {
+      //   console.error('Incorrect currency value TO')
+      //   return;
+      // }
 
-        if (selectedCurrency1 === "USD" && selectedCurrency2 === "EUR") {
-          convertedValue = (inputValue1 / usdRate) * eurRate;
-        } else if (selectedCurrency1 === "EUR" && selectedCurrency2 === "USD") {
-          convertedValue = (inputValue1 / eurRate) * usdRate;
-        } else if (selectedCurrency1 === "USD" && selectedCurrency2 === "UAH") {
-          convertedValue = inputValue1 * usdRate;
-        } else if (selectedCurrency1 === "UAH" && selectedCurrency2 === "USD") {
-          convertedValue = inputValue1 / usdRate;
-        } else if (selectedCurrency1 === "EUR" && selectedCurrency2 === "UAH") {
-          convertedValue = inputValue1 * eurRate;
-        } else if (selectedCurrency1 === "UAH" && selectedCurrency2 === "EUR") {
-          convertedValue = inputValue1 / eurRate;
-        } else {
-          convertedValue = inputValue1;
+      console.log('value item 2',  currencyItemTo)
+
+      const calculateRate = () => {
+        if (currencySelect1.value === 'UAH') {
+          return 1 * rateFrom / currencyItemTo
         }
 
-        numberInput2.value = parseFloat(convertedValue).toFixed(2);
-      } else if (inputValue2 !== "" && /^\d+$/.test(inputValue2)) {
-        const selectedCurrency1 = currencySelect1.value;
-        const selectedCurrency2 = currencySelect2.value;
-
-        let convertedValue;
-
-        if (selectedCurrency1 === "USD" && selectedCurrency2 === "EUR") {
-          convertedValue = (inputValue2 / usdRate) * eurRate;
-        } else if (selectedCurrency1 === "EUR" && selectedCurrency2 === "USD") {
-          convertedValue = (inputValue2 / eurRate) * usdRate;
-        } else if (selectedCurrency1 === "USD" && selectedCurrency2 === "UAH") {
-          convertedValue = inputValue2 * usdRate;
-        } else if (selectedCurrency1 === "UAH" && selectedCurrency2 === "USD") {
-          convertedValue = inputValue2 / usdRate;
-        } else if (selectedCurrency1 === "EUR" && selectedCurrency2 === "UAH") {
-          convertedValue = inputValue2 * eurRate;
-        } else if (selectedCurrency1 === "UAH" && selectedCurrency2 === "EUR") {
-          convertedValue = inputValue2 / eurRate;
-        } else {
-          convertedValue = inputValue2;
-        }
-
-        numberInput1.value = parseFloat(convertedValue).toFixed(2);
+        return currencyItemFrom * rateFrom / currencyItemTo
       }
+
+      numberInput2.value = calculateRate().toFixed(2);
+
+      
+
+
+
+      // if (inputValue1 !== "") {
+      //   const selectedCurrency1 = currencySelect1.value;
+      //   const selectedCurrency2 = currencySelect2.value;
+
+      //   let convertedValue;
+
+      //   // const convertUsdToUah = (usdValue) => usdValue * usdRate;
+      //   // const convertEurToUah = (eurValue) => eurValue * eurRate;
+      //   // const convertUahToUah = (uahValue) => uahValue // TODO: if selector values equal, copy the value
+      //   // const convertUahToUsd = (uahValue) => uahValue / usdRate;
+      //   // const convertUahToEur = (uahValue) => uahValue / eurRate;
+      //   // const convertUsdToEur = (usdValue) => usdValue * usdRate / eurRate;
+      //   // const convertEurToUsd = (eurValue) => eurValue * eurRate / usdRate;
+
+      //   if (selectedCurrency1 === "USD" && selectedCurrency2 === "EUR") {
+      //     convertedValue = (inputValue1 / usdRate) * eurRate;
+      //   } else if (selectedCurrency1 === "EUR" && selectedCurrency2 === "USD") {
+      //     convertedValue = (inputValue1 / eurRate) * usdRate;
+      //   } else if (selectedCurrency1 === "USD" && selectedCurrency2 === "UAH") {
+      //     convertedValue = inputValue1 * usdRate;
+      //   } else if (selectedCurrency1 === "UAH" && selectedCurrency2 === "USD") {
+      //     convertedValue = inputValue1 / usdRate;
+      //   } else if (selectedCurrency1 === "EUR" && selectedCurrency2 === "UAH") {
+      //     convertedValue = inputValue1 * eurRate;
+      //   } else if (selectedCurrency1 === "UAH" && selectedCurrency2 === "EUR") {
+      //     convertedValue = inputValue1 / eurRate;
+      //   } else {
+      //     convertedValue = inputValue1;
+      //   }
+
+      //   numberInput2.value = parseFloat(convertedValue).toFixed(2);
+      // } else if (inputValue2 !== "" && /^\d+$/.test(inputValue2)) {
+      //   const selectedCurrency1 = currencySelect1.value;
+      //   const selectedCurrency2 = currencySelect2.value;
+
+      //   let convertedValue;
+
+      //   if (selectedCurrency1 === "USD" && selectedCurrency2 === "EUR") {
+      //     convertedValue = (inputValue2 / usdRate) * eurRate;
+      //   } else if (selectedCurrency1 === "EUR" && selectedCurrency2 === "USD") {
+      //     convertedValue = (inputValue2 / eurRate) * usdRate;
+      //   } else if (selectedCurrency1 === "USD" && selectedCurrency2 === "UAH") {
+      //     convertedValue = inputValue2 * usdRate;
+      //   } else if (selectedCurrency1 === "UAH" && selectedCurrency2 === "USD") {
+      //     convertedValue = inputValue2 / usdRate;
+      //   } else if (selectedCurrency1 === "EUR" && selectedCurrency2 === "UAH") {
+      //     convertedValue = inputValue2 * eurRate;
+      //   } else if (selectedCurrency1 === "UAH" && selectedCurrency2 === "EUR") {
+      //     convertedValue = inputValue2 / eurRate;
+      //   } else {
+      //     convertedValue = inputValue2;
+      //   }
+
+      //   numberInput1.value = parseFloat(convertedValue).toFixed(2);
+      // }
     }
   })
   .catch((error) => {
